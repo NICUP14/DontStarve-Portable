@@ -1,10 +1,10 @@
 TARGET = template
-OBJS = src/main.o
+OBJS = $(patsubst src/%.c, src/%.o, $(wildcard src/*.c))
 
 PSP_LARGE_MEMORY = 1
 
 INCDIR = include
-CFLAGS = -O3 -G0 -Wall
+CFLAGS = -O3 -G0 -Wall  -g
 CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti
 ASFLAGS = $(CFLAGS)
 

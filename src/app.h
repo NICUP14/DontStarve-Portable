@@ -1,7 +1,11 @@
 // Application header - A unified interface for managing SDL2 windows
 
+#include <stdio.h>
 #include "psp-include.h"
 #include "multi-render.h"
+
+#ifndef APP_H
+#define APP_H
 
 typedef struct {
     int width;
@@ -9,6 +13,7 @@ typedef struct {
     const char *title;
 	SDL_Joystick *joystick;
     SDL_Window *window;
+    SDL_Renderer *tex_renderer;
     multi_renderer_t multi_renderer;
 } app_t;
 
@@ -19,7 +24,6 @@ app_t app;
     SDL_Log("%s_", app.title); \
     SDL_Log(__VA_ARGS__); \
     } while(0);
-
 
 int app_init(const char *title, int width, int height, int flags) {
     app.title = title;
@@ -49,7 +53,14 @@ int app_init(const char *title, int width, int height, int flags) {
         return -1;
     }
 
-
+    // create the texture renderer (OpenGL ES2)
+    app.tex_renderer = SDL_CreateRenderer(NULL, 0, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    if (!app.tex_renderer) {
+        app_log("SDL_CreateRenderer: %s\n", SDL_GetError());
+        SDL_Quit();
+        return -1;
+    }
+    
 	if (SDL_NumJoysticks() < 1)
 		app_log("No joysticks connected: %s\n", SDL_GetError());
 	
@@ -79,10 +90,15 @@ void app_free(void) {
 void app_exit(void) {
     app_free();
 	SDL_Quit();
+
+    #ifdef PSP_BUILD
 	sceKernelExitGame();
+    #endif
 }
 
 void app_run(void (*app_loop)(void)) {
     (*app_loop)();
     app_exit();
 }
+
+#endif
