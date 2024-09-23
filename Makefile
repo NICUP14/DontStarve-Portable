@@ -1,21 +1,28 @@
-TARGET = template
-OBJS = $(patsubst src/%.c, src/%.o, $(wildcard src/*.c))
+# Structure-related variables
+BUILD_DIR ?= bin
+SOURCE_DIR ?= src
+SOURCES = $(wildcard $(SOURCE_DIR)/*.c)
+OBJECTS = $(patsubst $(SOURCE_DIR)/%.c, $(BUILD_DIR)/%.o, $(SOURCES))
 
-PSP_LARGE_MEMORY = 1
+# Project-related variables
+PROJECT = main
 
-INCDIR = include
-CFLAGS = -O3 -G0 -Wall  -g
-CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti
-ASFLAGS = $(CFLAGS)
+# Compiler-related variables
+CC = gcc
+CFLAGS ?=
+CFLAGS += -g -Wall -Werror -I src
+CFLAGS += $(shell sdl2-config --cflags)
+LDFLAGS ?=
+LDFLAGS += $(shell sdl2-config --libs) -lm
 
-LIBDIR = libs
-LDFLAGS =
-LIBS = -lSDL2 -lGL -lGLU -lglut -lz -lpspvfpu -lpsphprm -lpspsdk -lpspctrl -lpspumd -lpsprtc \
-       -lpsppower -lpspgum -lpspgu -lpspaudiolib -lpspaudio -lpsphttp -lpspssl -lpspwlan \
-	   -lpspnet_adhocmatching -lpspnet_adhoc -lpspnet_adhocctl -lm -lpspvram
+# Alias definitions
+def: default
+cdef: clean default
+default: $(PROJECT)
+clean:
+	@rm -vrf $(BUILD_DIR)
 
-EXTRA_TARGETS = EBOOT.PBP
-PSP_EBOOT_TITLE = Template
-
-PSPSDK=$(shell psp-config --pspsdk-path)
-include $(PSPSDK)/lib/build.mak
+# Default linking rules
+$(PROJECT) : $(SOURCES)
+	@mkdir -p bin
+	$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $(BUILD_DIR)/$@

@@ -4,7 +4,7 @@
 #ifdef PSP_BUILD
 // Fixes missing '__ctype_ptr__'
 extern const char _ctype_[];
-const char* __ctype_ptr__ = _ctype_;
+const char *__ctype_ptr__ = _ctype_;
 
 #include <pspkernel.h>
 #include <pspdebug.h>
@@ -20,9 +20,9 @@ PSP_MAIN_THREAD_ATTR(THREAD_ATTR_USER | THREAD_ATTR_VFPU);
 #include <SDL2/SDL_rect.h>
 #include "stb_image.h"
 
-
 // Thanks to BlastlessAnthony on github!
-SDL_Surface *load_image(const char *filename) {
+SDL_Surface *load_image(const char *filename)
+{
   int width = 0;
   int height = 0;
   int bytes_per_pixel =
@@ -57,7 +57,8 @@ SDL_Surface *load_image(const char *filename) {
   SDL_Surface *surface = SDL_CreateRGBSurfaceFrom(
       data, width, height, bytes_per_pixel * 8, dot_pitch, red_mask, green_mask,
       blue_mask, alpha_mask);
-  if (!surface) {
+  if (!surface)
+  {
     SDL_free(data);
     return NULL;
   }
